@@ -1,0 +1,29 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+
+    "[python]": {
+        "editor.formatOnType": true,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "cSpell.userWords": [
+        "yolo"
+    ],
+    // single quotes - data, double quotes - human friendly text
+    "black-formatter.args": [
+        "--skip-string-normalization"
+    ],
+    "editor.rulers": [
+        // black theme only, for the white one, add colors in the comments
+        {
+            // code
+            "color": "#8c987e", // #xxxxxx - white theme
+            "column": 79
+        },
+        {   
+            // documentation
+            "color": "#514323", // #xxxxxx - white theme
+            "column": 72
+        }
+    ]
+}
