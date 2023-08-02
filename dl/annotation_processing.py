@@ -183,13 +183,12 @@ class TXTAnnotations:
             filename (str, optional): remove class(es) for specific
             file. Defaults to '*'.
         """
-        keep = self.update_classes(to_remove)
-
-        def remover(line: str, keep: Dict[int, int]) -> str:
-            line_new = self.upd_line(line, keep)
-            return line_new
-
-        read_and_update(self.txt_path, filename, remover, {'keep': keep})
+        read_and_update(
+            self.txt_path,
+            filename,
+            self.upd_line,
+            {'config': self.update_classes(to_remove)},
+        )
 
     def replace_classes(
         self, to_replace_with: Dict[int, int], filename: str = '*'
@@ -203,11 +202,9 @@ class TXTAnnotations:
             file. Defaults to '*'.
         """
         self.classes_config = to_replace_with
-
-        def replace(line: str, replacer: Dict[int, int]) -> str:
-            return self.upd_line(line, replacer)
-
-        read_and_update(self.txt_path, filename, replace, {'replacer': to_replace_with})
+        read_and_update(
+            self.txt_path, filename, self.upd_line, {'config': to_replace_with}
+        )
 
 
 class JSON2TXT(TXTAnnotations):
