@@ -25,5 +25,9 @@
             "color": "#514323", // #xxxxxx - white theme
             "column": 72
         }
+    ],
+    // grammar to ignore
+    "cSpell.words": [
+        "clss"
     ]
 }
