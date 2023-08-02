@@ -4,7 +4,12 @@ import os
 from glob import glob
 from typing import Dict, List, Tuple, Union
 
-from path_and_files_processing import combine_path, create_dir, get_filename, get_files
+from helpers.path_and_files_processing import (
+    combine_path,
+    create_dir,
+    get_filename,
+    get_files,
+)
 
 YOLO_FORMAT = '%(class_id)s %(x)s %(y)s %(w)s %(h)s'
 
