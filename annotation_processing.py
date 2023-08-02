@@ -175,6 +175,29 @@ class TXTAnnotations:
                         txt.write(f'{keep[cur_class]} {line_wo_class}')
                 txt.truncate()
 
+    def replace_classes(
+        self, to_replace_with: Dict[int, int], filename: str = '*'
+    ) -> None:
+        """Replace classes according to a new config - `to_replace_with`.
+
+        Args:
+            to_replace_with (Dict[int, int]): a new classes config,
+            where keys are old classes and values are new ones.
+            filename (str, optional): remove class(es) for specific
+            file. Defaults to '*'.
+        """
+        self.classes_config = to_replace_with
+
+        for txt in get_files(self.txt_path, filename):
+            with open(txt, "r+", encoding='utf-8') as txt:
+                new_txt = txt.readlines()
+                txt.seek(0)
+                for line in new_txt:
+                    cur_class, line_wo_class = line.split(' ', 1)
+                    cur_class = int(cur_class)
+                    txt.write(f'{to_replace_with[cur_class]} {line_wo_class}')
+                txt.truncate()
+
 
 class JSON2TXT(TXTAnnotations):
     """Converts JSON annotations to the TXT (YOLO) format"""
