@@ -2,13 +2,14 @@
 import json
 import os
 from glob import glob
-from typing import Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from helpers.path_and_files_processing import (
     combine_path,
     create_dir,
     get_filename,
     get_files,
+    read_and_update,
 )
 
 YOLO_FORMAT = '%(class_id)s %(x)s %(y)s %(w)s %(h)s'
@@ -79,6 +80,21 @@ class TXTAnnotations:
         self.images_path = images_path
         self.txt_path = create_dir(txt_path)
         self.classes_config = classes_config
+
+    def upd_line(self, line: str, config: Dict[int, Any]) -> str:
+        """Updates class from the line based on `config` dictionary.
+
+        Args:
+            line (str): file line - class and coordinates
+            config (Dict[int, Any]): update class with: key - old, value
+            - new
+
+        Returns:
+            int: updated line if class in `config`, otherwise empty str
+        """
+        clss, line_wo_class = line.split(' ', 1)
+        clss = int(clss)
+        return f'{config[clss]} {line_wo_class}' if clss in config else ''
 
     def empty_txt(self, filename: str = '*') -> None:
         """Create new empty (rewrite old) txt annotations to all
@@ -169,16 +185,11 @@ class TXTAnnotations:
         """
         keep = self.update_classes(to_remove)
 
-        for txt in get_files(self.txt_path, filename):
-            with open(txt, "r+", encoding='utf-8') as txt:
-                new_txt = txt.readlines()
-                txt.seek(0)
-                for line in new_txt:
-                    cur_class, line_wo_class = line.split(' ', 1)
-                    cur_class = int(cur_class)
-                    if cur_class not in to_remove:
-                        txt.write(f'{keep[cur_class]} {line_wo_class}')
-                txt.truncate()
+        def remover(line: str, keep: Dict[int, int]) -> str:
+            line_new = self.upd_line(line, keep)
+            return line_new
+
+        read_and_update(self.txt_path, filename, remover, {'keep': keep})
 
     def replace_classes(
         self, to_replace_with: Dict[int, int], filename: str = '*'
@@ -193,15 +204,10 @@ class TXTAnnotations:
         """
         self.classes_config = to_replace_with
 
-        for txt in get_files(self.txt_path, filename):
-            with open(txt, "r+", encoding='utf-8') as txt:
-                new_txt = txt.readlines()
-                txt.seek(0)
-                for line in new_txt:
-                    cur_class, line_wo_class = line.split(' ', 1)
-                    cur_class = int(cur_class)
-                    txt.write(f'{to_replace_with[cur_class]} {line_wo_class}')
-                txt.truncate()
+        def replace(line: str, replacer: Dict[int, int]) -> str:
+            return self.upd_line(line, replacer)
+
+        read_and_update(self.txt_path, filename, replace, {'replacer': to_replace_with})
 
 
 class JSON2TXT(TXTAnnotations):

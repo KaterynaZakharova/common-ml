@@ -2,7 +2,7 @@
 from glob import glob
 import os
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Callable
 
 
 def create_dir(path: str) -> str:
@@ -65,3 +65,27 @@ def get_files(folder: str, filename: str) -> List[str]:
         List[str]: path to files
     """
     return glob(combine_path(folder, filename, None))
+
+
+def read_and_update(
+    path: str, filename: str, inner_func: Callable, inner_vars: dict = {}
+) -> None:
+    """Reads file line by line and updates it using `inner_func`.
+
+    Args:
+        path (str): path to file(s)
+        filename (str): filename or, if iterate over all the files,
+        pass *
+        inner_func (Callable): operation to perform for each line.
+        Output of the function is always `str`.
+        inner_vars (dict, optional): arguments to pass to `inner_func`.
+        Defaults to {}.
+    """
+    for files in get_files(path, filename):
+        with open(files, 'r+', encoding='utf-8') as file:
+            new_file = file.readlines()
+            file.seek(0)
+            for line in new_file:
+                if out := inner_func(line, **inner_vars):
+                    file.write(out)
+            file.truncate()
