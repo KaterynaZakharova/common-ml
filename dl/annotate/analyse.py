@@ -1,6 +1,7 @@
 """Annotations analyse: quantity, bbox scale, position, distribution."""
-from glob import glob
 from typing import List, Tuple, Union, Set, Dict
+
+from helpers.path_and_files_processing import combine_path
 
 
 def counter(
@@ -24,7 +25,7 @@ def counter(
         pairs
     """
     cnt = {cl: 0 for cl in classes}
-    for txt_file in glob(f'{path}/{filename}.txt'):
+    for txt_file in combine_path(path, filename):
         with open(txt_file, encoding='utf-8') as txt:
             while clss := txt.readline().split(' ', 1)[0]:
                 if clss not in cnt:

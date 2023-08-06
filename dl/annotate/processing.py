@@ -110,7 +110,7 @@ class TXTAnnotations:
         for txt in get_files(self.txt_path, filename):
             open(txt, 'w', encoding='utf-8').close()
 
-    def add_txt(self, filename: str = '*') -> None:
+    def add_txt(self, filename: str = '*.[!txt]*') -> None:
         """Add empty txt annotations to the pictures with no annotations.
 
         If `filename` was passed, the function will work only for that
@@ -118,7 +118,7 @@ class TXTAnnotations:
 
         Args:
             filename (str, optional): file name without its path.
-            Defaults to *.
+            Defaults to `*.[!txt]*` (find no .txt files).
         """
         for img in get_files(self.images_path, filename):
             txt_file = combine_path(self.txt_path, get_filename(img))
