@@ -41,7 +41,9 @@ def bbox2yolo(
     return x, y, w, h
 
 
-def yolo2bbox(x: float, y: float, w: float, h: float) -> Tuple[int, int, int, int]:
+def yolo2bbox(
+    x: float, y: float, w: float, h: float, img_width: int, img_height: int
+) -> Tuple[int, int, int, int]:
     """Convert scaled (YOLO) coordinates to a bounding box (rectangle).
 
     Args:
@@ -49,14 +51,24 @@ def yolo2bbox(x: float, y: float, w: float, h: float) -> Tuple[int, int, int, in
         y (float): centre point Y
         w (float): rectangle width
         h (float): rectangle height
+        img_width (int): image width
+        img_height (int): image height
 
     Returns:
         Tuple[int, int, int, int]: top left point (min x, y),
         bottom right point (max x, y)
     """
-    xmin, ymin = int(x - w / 2), int(y - h / 2)
-    xmax, ymax = int(x + w / 2), int(y + h / 2)
-    return xmin, ymin, xmax, ymax
+    left = int((x - w / 2) * img_width)
+    right = int((x + w / 2) * img_width)
+    top = int((y - h / 2) * img_height)
+    bottom = int((y + h / 2) * img_height)
+
+    left = max(left, 0)
+    right = min(right, img_width - 1)
+    top = max(top, 0)
+    bottom = min(bottom, img_height - 1)
+
+    return left, top, right, bottom
 
 
 class TXTAnnotations:
